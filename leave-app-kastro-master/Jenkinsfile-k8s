@@ -16,7 +16,7 @@ pipeline {
     stages {
         stage('Build Maven Project') {
             steps {
-                dir('java-backend') {
+                dir('leave-app-kastro-master') {
                     sh 'mvn clean install -DskipTests'
                 }
             }
@@ -24,7 +24,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                dir('java-backend') {
+                dir('leave-app-kastro-master') {
                     script {
                         sh "docker build -t ${IMAGE_NAME}:${DOCKER_TAG} ."
                     }
