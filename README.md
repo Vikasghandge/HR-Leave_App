@@ -182,7 +182,6 @@ pipeline {
         DOCKER_IMAGE = "ghandgevikas/leave-management"
         DOCKER_TAG = "${BUILD_NUMBER}"
         APP_DIR = "leave-app-kastro-master"
-
     }
 
     stages {
@@ -223,28 +222,26 @@ pipeline {
         }
 
         stage('Push Docker Image') {
-    steps {
-        withCredentials([usernamePassword(credentialsId: 'docker-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-            sh '''
-            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-            docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
-            docker push ${DOCKER_IMAGE}:latest
-            '''
-        }
-    }
-}
-
-
-       stage('Deploy with Docker Compose') {
             steps {
-               dir("${APP_DIR}") {
-                   sh "docker compose down || true"
-                    sh "DOCKER_TAG=${DOCKER_TAG} docker compose pull || true"
-                sh "DOCKER_TAG=${DOCKER_TAG} docker compose up -d"
-              }
+                withCredentials([usernamePassword(credentialsId: 'docker-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    docker push ${DOCKER_IMAGE}:latest
+                    '''
+                }
             }
         }
 
+        stage('Deploy with Docker Compose') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh "docker compose down || true"
+                    sh "DOCKER_TAG=${DOCKER_TAG} docker compose pull || true"
+                    sh "DOCKER_TAG=${DOCKER_TAG} docker compose up -d"
+                }
+            }
+        }
     }
 }
 
