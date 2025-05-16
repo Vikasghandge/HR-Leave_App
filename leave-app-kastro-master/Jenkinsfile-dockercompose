@@ -1,0 +1,68 @@
+pipeline {
+    agent any
+
+    tools {
+        jdk 'jdk17'
+        maven 'maven3'
+    }
+
+    environment {
+        DOCKER_HUB_CREDS = credentials('docker-creds')
+        DOCKER_IMAGE = "kastrov/leave-management"
+        DOCKER_TAG = "${BUILD_NUMBER}"
+    }
+
+    stages {
+        stage('Git Clone') {
+            steps {
+                git 'https://github.com/KastroVKiran/leave-app-kastro.git'
+            }
+        }
+
+        stage('Build Project') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Prepare Docker Assets') {
+            steps {
+                sh '''
+                # Always fetch fresh wait-for-it.sh
+                wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -O wait-for-it.sh
+
+                # Fix shebang to /usr/bin/env bash (portable)
+                sed -i '1s|^.*$|#!/usr/bin/env bash|' wait-for-it.sh
+
+                # Remove Windows CRLF
+                dos2unix wait-for-it.sh || sed -i 's/\\r$//' wait-for-it.sh
+
+                chmod +x wait-for-it.sh
+                '''
+            }
+        }
+
+        stage('Create Docker Image') {
+            steps {
+                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh "echo ${DOCKER_HUB_CREDS_PSW} | docker login -u ${DOCKER_HUB_CREDS_USR} --password-stdin"
+                sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                sh "docker push ${DOCKER_IMAGE}:latest"
+            }
+        }
+
+        stage('Deploy with Docker Compose') {
+            steps {
+                sh "docker-compose down || true"
+                sh "DOCKER_TAG=${DOCKER_TAG} docker-compose pull || true"
+                sh "DOCKER_TAG=${DOCKER_TAG} docker-compose up -d"
+            }
+        }
+    }
+}
