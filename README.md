@@ -246,6 +246,74 @@ pipeline {
 }
 
 ```
+
+now we have deployed our application using docker and docker-compose check 
+
+```
+http://<ip addreess server>:8090
+```
+
+## k8s part starts ##
+
+first we need to create one IAM user
+go and create IAM user name: HR-user
+attach policy to the user.  
+ec2-full-access, IAM-full-access, cloudformation-full-access, administration access, AmazonEKS_CNI_Policy,
+AmazoneEKSWorkerNodePolicy, amazoneEKSClusterPolicy
+add this above give policies to the user & create user click on user add permmsions inline policy
+add this inline policy 
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "VisualEditor",
+      "Effect": "Allow",
+      "Action": "eks:*",
+      "Resource": "*"
+    }
+  ]
+}
+```
+give any name like custo-leave-policy and attach that policy to the user now we have to create credentilas of our user HR-user create secrete key and secrete accesskey save it very safe place.
+
+go to the jenkins manage jenkins  --> security --> credeintlas --> global --> aws credentilas  -->
+add your access key and secrete access key 
+ID= aws-eks-creds
+Description: aws-eks-creds
+save it.
+
+install aws cli
+---
+```
+apt install unzip
+```
+```
+curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin
+kubectl version --short --client
+
+```
+now we need to configure aws 
+```
+aws configure
+```
+add access key of HR-user
+add secret access key of HR-user
+add region = ap-south-1
+
+command to check credentilas
+```
+aws sts get-caller identity
+```
+
+
+
+
+
+
+
         
 
 
