@@ -146,7 +146,110 @@ now we have setup tools now we need to setup jenkins plugins.
 login inside jenkins go to dashboard --> manage jenkins --> plugins --> available plugins 
 downloade below plugins.
 
-SonarQube scanner, Docker, Docker Commons, Docker Pipeline, Docker API, docker-build-step, Pipeline stage view, Email Extension Template, Kubernetes, Kubernetes CLI, Kubernetes Client API, Kubernetes Credentials, Kubernetes Credentials Provider, Config File Provider, Prometheus metrics,  BlueOcean,  Eclipse Temurin Installer, Owasp Dependency Check.
+SonarQube scanner, Docker, Docker Commons, Docker Pipeline, Docker API, docker-build-step, Pipeline stage view, Email Extension Template, Kubernetes, Kubernetes CLI, Kubernetes Client API, Kubernetes Credentials, Kubernetes Credentials Provider, Config File Provider, Prometheus metrics,  BlueOcean,  Eclipse Temurin Installer, Owasp Dependency Check. aws cli.
+
+
+
+
+now we need to setup tools 
+go to dashbord  --> manage jenkins --> tools 
+add tool jdk name: jdk17 -- install automatically Install from adoptium.net  version: jdk-17.0.11+9
+add tool maven  name: maven3 -- install automatically - choose latest
+add tool docker name: docker -- install automativally --from dcoker.com
+now tools setups is done but in this setup we have not added sonarqube i will update it later.
+
+now we need to add docker credentials into the jenkins.
+dashboard --> manage jenkins --> security --> credentilas --> global --> add credentilas.
+dcoker-hub username and password and also add ID
+docker username -- ghandgevikas 
+passoword -- *****
+ID=docker-creds  description=docker-creds   add creds and save it.
+
+now till the setps we have done our steup now we need to deploy our application.
+
+go to the jenkins dashbord new item add your pipeline below
+```
+pipeline {
+    agent any
+
+    tools {
+        jdk 'jdk17'
+        maven 'maven3'
+    }
+
+    environment {
+        DOCKER_HUB_CREDS = credentials('docker-creds')
+        DOCKER_IMAGE = "ghandgevikas/leave-management"
+        DOCKER_TAG = "${BUILD_NUMBER}"
+        APP_DIR = "leave-app-kastro-master"
+
+    }
+
+    stages {
+        stage('Git Clone') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Vikasghandge/HR-Leave_App.git'
+            }
+        }
+
+        stage('Build Project') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Prepare Docker Assets') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh '''
+                    wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -O wait-for-it.sh
+                    sed -i '1s|^.*$|#!/usr/bin/env bash|' wait-for-it.sh
+                    dos2unix wait-for-it.sh || sed -i 's/\\r$//' wait-for-it.sh
+                    chmod +x wait-for-it.sh
+                    '''
+                }
+            }
+        }
+
+        stage('Create Docker Image') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                    sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'docker-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+            sh '''
+            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+            docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+            docker push ${DOCKER_IMAGE}:latest
+            '''
+        }
+    }
+}
+
+
+       stage('Deploy with Docker Compose') {
+            steps {
+               dir("${APP_DIR}") {
+                   sh "docker compose down || true"
+                    sh "DOCKER_TAG=${DOCKER_TAG} docker compose pull || true"
+                sh "DOCKER_TAG=${DOCKER_TAG} docker compose up -d"
+              }
+            }
+        }
+
+    }
+}
+
+```
+        
 
 
 
@@ -156,6 +259,8 @@ SonarQube scanner, Docker, Docker Commons, Docker Pipeline, Docker API, docker-b
 
 
 
+
+.
 
 
 
