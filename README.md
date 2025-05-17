@@ -691,13 +691,14 @@ or
 kubectl get deployment -A
 ```
 
-to access loadbalancer link
+## to access loadbalancer link
 ```
 kubectl get svc -n leave-management
 or
 kubectl get svc -A
 ```
 copy your load balancer and paste as it is in google and access application.
+![Alt text](images/Screenshot%2025-05-17%025503.png)
 
 ## trouble shooting commnads
 ```
