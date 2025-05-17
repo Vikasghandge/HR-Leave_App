@@ -466,20 +466,255 @@ kubectl get pods -n kube-system | grep ebs-csi
 ```
 
 then output should be like this.
---------------------------------------------------------------------------------------------------------------------------------------------------------------------
-output -- 
+
+output ..
 ebs-csi-controller-6cfcb8b5b-56lzk  5/5     Running   0           86s
 ebs-csi-controller-6cfcb8b5b-6s98z   5/5     Running   0          86s
 ebs-csi-node-h6wpr                   3/3     Running   0          86s
 ebs-csi-node-wdtz5                   3/3     Running   0          86s
 ebs-csi-node-xgshv
---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 now sucessfully we have done our work now we need to deploy pipeline.
 add below given pipeline in jenkins dashbord -- new inte -- then paste give pipeline.
 ```
+pipeline {
+    agent any
+
+    tools {
+        jdk 'jdk17'
+        maven 'maven3'
+    }
+
+    environment {
+        DOCKER_HUB_CREDS = credentials('docker-creds')
+        DOCKER_IMAGE = "ghandgevikas/leave-management"
+        DOCKER_TAG = "${BUILD_NUMBER}"
+        APP_DIR = "leave-app-kastro-master"
+        EKS_CLUSTER = "my-eks"
+        AWS_REGION = "ap-south-1"
+        K8S_NAMESPACE = "leave-management"
+        MYSQL_WAIT_TIMEOUT = "300"
+        APP_WAIT_TIMEOUT = "300"
+    }
+
+    stages {
+        stage('Git Clone') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Vikasghandge/HR-Leave_App.git'
+            }
+        }
+
+        stage('Build Project') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Prepare Docker Assets') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh '''
+                    wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -O wait-for-it.sh
+                    sed -i '1s|^.*$|#!/usr/bin/env bash|' wait-for-it.sh
+                    dos2unix wait-for-it.sh || sed -i 's/\\r$//' wait-for-it.sh
+                    chmod +x wait-for-it.sh
+                    '''
+                }
+            }
+        }
+
+        stage('Create Docker Image') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                    sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh """
+                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    docker push ${DOCKER_IMAGE}:latest
+                    """
+                }
+            }
+        }
+
+        /*
+        stage('Deploy with Docker Compose') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh "docker compose down || true"
+                    sh "DOCKER_TAG=${DOCKER_TAG} docker compose pull || true"
+                    sh "DOCKER_TAG=${DOCKER_TAG} docker compose up -d"
+                }
+            }
+        }
+        */
+
+        stage('Configure AWS EKS Access') {
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-eks-creds',
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) {
+                    sh """
+                        aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
+                        aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
+                        aws configure set region ${AWS_REGION}
+                        aws eks --region ${AWS_REGION} update-kubeconfig --name ${EKS_CLUSTER}
+                        kubectl create namespace ${K8S_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
+                        kubectl config set-context --current --namespace=${K8S_NAMESPACE}
+                        kubectl cluster-info
+                        kubectl get nodes
+                    """
+                }
+            }
+        }
+
+        stage('Deploy MySQL') {
+            steps {
+                dir('leave-app-kastro-master/k8s') {
+                    script {
+                        sh """
+                            kubectl apply -f ebs-sc.yml -n ${K8S_NAMESPACE}
+                            kubectl apply -f mysql-secret.yml -n ${K8S_NAMESPACE}
+                            kubectl apply -f mysql-pvc.yml -n ${K8S_NAMESPACE}
+                            kubectl apply -f mysql-deployment.yml -n ${K8S_NAMESPACE}
+                            kubectl apply -f mysql-service.yml -n ${K8S_NAMESPACE}
+                        """
+
+                        sh """
+                            kubectl patch deployment mysql -n ${K8S_NAMESPACE} --type=json \
+                                -p='[{"op": "remove", "path": "/spec/template/spec/containers/0/env/2"}]' || true
+                            kubectl patch deployment mysql -n ${K8S_NAMESPACE} --type=json \
+                                -p='[{"op": "remove", "path": "/spec/template/spec/containers/0/env/3"}]' || true
+                        """
+
+                        timeout(time: 10, unit: 'MINUTES') {
+                            sh """
+                                kubectl rollout status deployment/mysql -n ${K8S_NAMESPACE}
+                                kubectl wait --for=condition=Ready pod -l app=mysql --timeout=600s -n ${K8S_NAMESPACE}
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Application') {
+            steps {
+                dir('leave-app-kastro-master/k8s') {
+                    script {
+                        sh """
+                            sed -i "s|image:.*|image: ${DOCKER_IMAGE}:${DOCKER_TAG}|g" deployment.yml
+                            kubectl apply -f deployment.yml -n ${K8S_NAMESPACE}
+                            kubectl apply -f service.yml -n ${K8S_NAMESPACE}
+                        """
+                    }
+                }
+
+                script {
+                    timeout(time: 5, unit: 'MINUTES') {
+                        sh """
+                            kubectl rollout status deployment/leave-management-app --timeout=${APP_WAIT_TIMEOUT}s -n ${K8S_NAMESPACE}
+                            for i in {1..10}; do
+                                kubectl get pods -l app=leave-management -n ${K8S_NAMESPACE} | grep -q 'Running' && break || sleep 10
+                            done
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                script {
+                    def appUrl = sh(returnStdout: true, script: """
+                        kubectl get svc leave-management-service -n ${K8S_NAMESPACE} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+                    """).trim()
+                    echo "##[success] Application deployed: http://${appUrl}:8090"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker system prune -f'
+        }
+        failure {
+            sh """
+                kubectl get pods -n ${K8S_NAMESPACE} > k8s-logs/failure.log
+                kubectl logs -l app=mysql -n ${K8S_NAMESPACE} --tail=50 >> k8s-logs/failure.log
+            """
+        }
+    }
+}
 
 ```
+
+### error trouble shooting
+1) pipeline is not able to find you docker file or pox.xml file in pipeline add correct path
+2) example my docker file is in "leave-app-kastro-master" you need to mention it
+3) then pom.xml check it should be first folder it should be this folder "leave-app-kastro-master/k8s"
+4) very verify credeintilas and id your aws credentilas should be match with pipeline
+5) example docker hub credentilas ID "docker-creds" it should match with pipeline
+6) more maven, sonarQube, owasp, aws credeintilas.
+7) tools configure make sure you have configured all required tools.
+
+## steps to access our application using loadbalancer.
+run some below commands.
+first check your namespace.
+```
+kubectl get namespace
+```
+to access pods in you name space
+```
+kubectl get pods -n leave-management
+or
+kubectl get pods -A
+```
+
+```
+kubectl get deployment -n leave-management
+or
+kubectl get deployment -A
+```
+
+to access loadbalancer link
+```
+kubectl get svc -n leave-management
+or
+kubectl get svc -A
+```
+copy your load balancer and paste as it is in google and access application.
+
+trouble shooting commnads
+```
+kubectl describe node <node-name>   # node level issue.
+```
+
+```
+kubect describe get pod -n leave-management  # pod level issue
+```
+you can also go for 
+check resources 
+```  
+kubectl top nodes   # resorces use node level
+or
+kubectl top pods   # use pod level
+```
+
 
 
 
