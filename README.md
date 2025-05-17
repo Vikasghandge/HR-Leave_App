@@ -699,7 +699,7 @@ kubectl get svc -A
 ```
 copy your load balancer and paste as it is in google and access application.
 
-trouble shooting commnads
+## trouble shooting commnads
 ```
 kubectl describe node <node-name>   # node level issue.
 ```
@@ -715,6 +715,79 @@ or
 kubectl top pods   # use pod level
 ```
 
+ Cluster & Node Health
+```
+kubectl cluster-info                # View cluster info
+kubectl get nodes                  # List all nodes
+kubectl describe node <node-name> # Node details (CPU, memory, pods)
+kubectl top nodes                 # View node resource usage
+
+```
+
+ Pod Troubleshooting
+ ```
+kubectl get pods -A                          # List all pods in all namespaces
+kubectl describe pod <pod-name>              # Details of pod (events, status, etc.)
+kubectl logs <pod-name>                      # View logs of pod (single container)
+kubectl logs <pod-name> -c <container-name>  # Logs for multi-container pod
+kubectl exec -it <pod-name> -- /bin/sh       # Shell into pod (or use /bin/bash)
+kubectl top pod <pod-name>                   # Pod resource usage
+
+```
+
+Deployment & ReplicaSet
+```
+kubectl get deployments                     # List deployments
+kubectl describe deployment <deployment>    # Detailed info & events
+kubectl rollout status deployment/<name>    # Rollout status
+kubectl rollout history deployment/<name>   # Check previous versions
+kubectl rollout undo deployment/<name>      # Rollback to previous version
+
+```
+
+CrashLoopBackOff / Failed Pods
+```
+kubectl get pods -n <namespace>                              # See pod status
+kubectl describe pod <pod-name> -n <namespace>               # Check events
+kubectl logs <pod-name> --previous -n <namespace>            # Get logs from previous failed pod
+kubectl delete pod <pod-name> -n <namespace>                 # Restart a stuck pod manually
+
+```
+
+Service & Networking
+```
+kubectl get svc -A                             # List all services
+kubectl describe svc <service-name>            # Details of a service
+kubectl get endpoints                          # Check endpoint mappings
+kubectl get ingress -A                         # Check ingress resources
+kubectl describe ingress <ingress-name>        # Debug ingress
+
+```
+
+volume and pv and pvc
+```
+kubectl get pvc -A                             # List all Persistent Volume Claims
+kubectl describe pvc <pvc-name>                # Details of a PVC
+kubectl get pv                                 # List Persistent Volumes
+
+```
+
+config and secrets
+  ```
+kubectl get configmap -A
+kubectl describe configmap <name>
+
+kubectl get secret -A
+kubectl describe secret <name>
+
+```
+
+```
+kubectl delete pod <pod-name>                 # Delete a pod
+kubectl delete deployment <name>              # Delete deployment
+kubectl delete svc <svc-name>                 # Delete service
+
+```
 
 
 
