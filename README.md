@@ -308,6 +308,182 @@ command to check credentilas
 aws sts get-caller identity
 ```
 
+now lets create eks cluster.
+we are here using cloudformation here for create cluster
+first we need to steup kubectl.
+vi kubectl.sh
+```
+#!/bin/bash
+curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin
+kubectl version --short --client
+```
+
+then we need to setup  eks-ctl
+vi eks-ctl.sh
+```
+#!/bi/bash
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/local/bin
+eksctl version
+
+```
+
+now need to setup eks cluster.
+```
+eksctl create cluster --name=my-eks \
+                      --region=ap-south-1 \
+                      --zones=ap-south-1a,ap-south-1b \
+                      --version=1.30 \
+                      --without-nodegroup
+```
+once cluster got created then add next command.
+
+```
+eksctl utils associate-iam-oidc-provider \
+    --region ap-south-1 \
+    --cluster my-eks \
+    --approve
+```
+
+then create node groups according to your need if you want to customize you can do add your cluster-name then add region where u want to create cluster
+select instance type add nodes according to you make sure to add ssh public key example= "vikas-key".
+```
+eksctl create nodegroup --cluster=my-eks \             
+                       --region=ap-south-1 \
+                       --name=node2 \
+                       --node-type=t3.medium \
+                       --nodes=3 \
+                       --nodes-min=2 \
+                       --nodes-max=4 \
+                       --node-volume-size=20 \
+                       --ssh-access \
+                       --ssh-public-key=vikas-key \
+                       --managed \
+                       --asg-access \
+                       --external-dns-access \
+                       --full-ecr-access \
+                       --appmesh-access \
+                       --alb-ingress-access
+```
+ once your node got created go to aws console go to eks then select cluster you cluster go to networking check additional security groups 
+ add - all traffic allow - to interact worknode to master node they can communicate with each other.
+
+ now done go to your ubuntu server run some commands. to check available storage clasess.
+```
+kubectl get storageclass
+```
+to check ebs-csi driver we need to run below command currently we dont have any ebs-csi driver.
+```
+kubectl get pods -n kube-system | grep ebs-csi
+```
+
+### now we need to install EBS-CSI driver (if missing)
+create iam policy for worker nodes 
+downloade policy json.
+```
+curl -o example-iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-ebs-csi-driver/master/docs/example-iam-policy.json
+```
+
+create iam policy to grants permissions to create/delete/modify ebs volumes 
+- applied at the service account level (not node level only service account level) for security
+```
+aws iam create-policy \
+--policy-name AmazonEKS_EBS_CSI_Driver_Policy \
+--policy-document file://example-iam-policy.json  
+```
+
+above given command will generate one arn copy it example ##  arn:aws:iam::543157869024:policy/AmazonEKS_EBS_CSI_Driver_Policy ## like this copy it from prompt.
+
+
+create iam role for service account.
+set your cluste name.
+
+```
+EKS_CLUSTER_NAME="my-eks"        # ✅ Sets the EKS cluster name
+AWS_REGION="ap-south-1"          # ✅ Sets the AWS region to Mumbai
+ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)  # ✅ Retrieves your AWS account ID
+```
+
+create iam oidc provider 
+```
+eksctl utils associate-iam-oidc-provider \
+    --cluster ${EKS_CLUSTER_NAME} \
+    --approve
+
+```
+
+now crate service account with IAM role.
+
+```
+eksctl create iamserviceaccount \
+--name ebs-csi-controller-sa \
+--namespace kube-system \
+--cluster ${EKS_CLUSTER_NAME} \
+--attach-policy-arn arn:aws:iam::543157869024:policy/AmazonEKS_EBS_CSI_Driver_Policy \
+--approve \
+--override-existing-serviceaccounts
+```
+now above command be careful bcz here you need to past that arn token which you have created above.
+example in your commadn paste token like this way
+--attach-policy-arn arn:aws:iam::543157869024:policy/AmazonEKS_EBS_CSI_Driver_Policy \
+--attach-policy-arn <past as it is your arn here like above >/AmazonEKS_EBS_CSI_Driver_Policy \
+
+now we have sucessfully setup our service account
+
+now we need to setup or install helm chat
+run below command to install helm.
+```
+sudo snap install helm --classic
+```
+```
+helm version
+```
+
+add aws-ebs-csi-driver helm repo.
+add repo
+```
+helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+```
+update repo
+```
+helm repo update
+```
+
+install ebs-csi driver
+```
+helm upgrade --install aws-ebs-csi-driver \
+--namespace kube-system \
+--set controller.serviceAccount.create=false \
+--set controller.serviceAccount.name=ebs-csi-controller-sa \
+aws-ebs-csi-driver/aws-ebs-csi-driver
+```
+
+after running above use below command.
+```
+kubectl get pods -n kube-system | grep ebs-csi
+```
+
+then output should be like this.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+output -- 
+ebs-csi-controller-6cfcb8b5b-56lzk  5/5     Running   0           86s
+ebs-csi-controller-6cfcb8b5b-6s98z   5/5     Running   0          86s
+ebs-csi-node-h6wpr                   3/3     Running   0          86s
+ebs-csi-node-wdtz5                   3/3     Running   0          86s
+ebs-csi-node-xgshv
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+now sucessfully we have done our work now we need to deploy pipeline.
+add below given pipeline in jenkins dashbord -- new inte -- then paste give pipeline.
+```
+
+```
+
+
+
+
 
 
 
