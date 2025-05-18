@@ -426,9 +426,12 @@ eksctl create iamserviceaccount \
 --override-existing-serviceaccounts
 ```
 now above command be careful bcz here you need to past that arn token which you have created above.
+
 example in your commadn paste token like this way
+
 --attach-policy-arn arn:aws:iam::543157869024:policy/AmazonEKS_EBS_CSI_Driver_Policy \
---attach-policy-arn <past as it is your arn here like above >/AmazonEKS_EBS_CSI_Driver_Policy \
+
+--attach-policy-arn -arn token- /AmazonEKS_EBS_CSI_Driver_Policy \
 
 now we have sucessfully setup our service account
 
