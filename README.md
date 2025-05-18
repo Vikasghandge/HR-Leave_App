@@ -1,9 +1,16 @@
-# HR-Leave_App
-# prequsite
-lanuch ec2 instance = name: HR-Leave-App,  
-os=ubuntu, 
-instance_type=t2.medium or t2.large
-stoarge=30GB key=vikas-key
+🧑‍💼 HR Leave Management App - CI/CD & K8s Deployment
+🚀 Project Overview
+This project sets up a complete CI/CD pipeline using Jenkins and Docker, with deployment via Docker Compose and Kubernetes (EKS). It includes image scanning tools like Trivy and Docker Scout, and SonarQube for code quality.
+
+
+📋 Prerequisites
+AWS EC2 Instance:
+Name: HR-Leave-App
+OS: Ubuntu
+Instance Type: t2.medium or t2.large
+Storage: 30GB
+Key Pair: vikas-key
+
 
 ssh into your server -
 first of all install jenkins on your ubuntu instance 
