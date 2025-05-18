@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_instance" "my-aws_instance" {
-    ami = "value"
-    instance_type = "t2.meduim"
+    ami = "ami-0af9569868786b23a"
+    instance_type = "t2."
     
 }
