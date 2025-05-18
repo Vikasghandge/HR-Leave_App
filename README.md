@@ -1,6 +1,9 @@
 # HR-Leave_App
 # prequsite
-lanuch ec2 instance = name: HR-Leave-App,  os=ubuntu, instance_type=t2.medium or t2.large stoarge=30GB key=vikas-key
+lanuch ec2 instance = name: HR-Leave-App,  
+os=ubuntu, 
+instance_type=t2.medium or t2.large
+stoarge=30GB key=vikas-key
 
 ssh into your server -
 first of all install jenkins on your ubuntu instance 
