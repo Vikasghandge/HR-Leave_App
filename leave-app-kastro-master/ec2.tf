@@ -4,5 +4,6 @@ provider "aws" {
 
 resource "aws_instance" "my-aws_instance" {
     ami = "value"
+    instance_type = "value"
     
 }
