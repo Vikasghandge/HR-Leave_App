@@ -145,8 +145,8 @@ then install docker scout it is also security checker tool.
 run below give command to install docker scout.
 
 ```
-curl -sSfL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh 
-```
+curl -sSfL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh | sh
+ ```
 now we have to run docker container of sonarqube this source code quality checker tool checks the insecurity, bugs, duplications inside the code.
 
 run container useing following docker command.
