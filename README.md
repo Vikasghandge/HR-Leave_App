@@ -174,76 +174,36 @@ SonarQube scanner, Docker, Docker Commons, Docker Pipeline, Docker API, docker-b
 
 Below is the list of key plugins integrated into this Jenkins setup, making it powerful and flexible for CI/CD, Docker, Kubernetes, security, and monitoring.
 
----
+# 🔌 Jenkins Plugins Used
 
-## 🚀 Core CI/CD & Containerization Plugins
+- SonarQube Scanner 🔍  
+- Docker 🐳  
+- Docker Commons ⚙️  
+- Docker Pipeline 🚦  
+- Docker API 🛠️  
+- docker-build-step 🏗️  
+- Pipeline stage view 🎭  
+- Email Extension Template 📧  
+- Kubernetes ☸️  
+- Kubernetes CLI 💻  
+- Kubernetes Client API 🔗  
+- Kubernetes Credentials 🔐  
+- Kubernetes Credentials Provider 🗝️  
+- Config File Provider 📄  
+- Prometheus metrics 📊  
+- BlueOcean 🌊  
+- Eclipse Temurin Installer ☕  
+- OWASP Dependency Check 🔒  
+- AWS CLI ☁️  
+- nodejs
 
-| Plugin                          | Description                                    | Logo / Badge |
-|--------------------------------|------------------------------------------------|--------------|
-| **SonarQube Scanner**           | Code quality & static analysis                  | ![SonarQube](https://www.sonarsource.com/wp-content/uploads/2020/05/sonarqube-logo.png){width=30} |
-| **Docker**                     | Docker integration for container builds        | ![Docker](https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png){width=30} |
-| **Docker Commons**             | Common Docker utilities                          | 🐳 |
-| **Docker Pipeline**            | Docker support in Jenkins Pipeline               | 🐳 |
-| **Docker API**                 | API support for Docker integration               | 🐳 |
-| **docker-build-step**          | Build Docker images as Jenkins build steps       | 🐳 |
 
----
 
-## ⚙️ Kubernetes & Cloud Native Plugins
 
-| Plugin                          | Description                                    | Logo / Badge |
-|--------------------------------|------------------------------------------------|--------------|
-| **Kubernetes**                  | Kubernetes cluster integration                   | ![Kubernetes](https://upload.wikimedia.org/wikipedia/commons/3/39/Kubernetes_logo_without_workmark.svg){width=30} |
-| **Kubernetes CLI**              | CLI tools for Kubernetes management              | ![kubectl](https://cdn.iconscout.com/icon/free/png-256/kubernetes-2-569451.png){width=30} |
-| **Kubernetes Client API**       | Client API support for Kubernetes interaction    | 🔧 |
-| **Kubernetes Credentials**      | Credential management for Kubernetes             | 🔐 |
-| **Kubernetes Credentials Provider** | Helps store Kubernetes credentials securely  | 🔐 |
-| **Config File Provider**        | Manage configuration files securely              | 📄 |
 
----
 
-## 📊 Monitoring & Reporting Plugins
 
-| Plugin                          | Description                                    | Logo / Badge |
-|--------------------------------|------------------------------------------------|--------------|
-| **Prometheus Metrics**          | Export Jenkins metrics for Prometheus           | ![Prometheus](https://prometheus.io/assets/prometheus_logo_grey.svg){width=30} |
-| **BlueOcean**                  | Modern Jenkins UI for Pipeline visualization    | ![BlueOcean](https://www.jenkins.io/images/logos/blueocean/blueocean.svg){width=30} |
-| **Email Extension Template**   | Customizable email notifications                 | 📧 |
 
----
-
-## 🛡️ Security & Quality Plugins
-
-| Plugin                          | Description                                    | Logo / Badge |
-|--------------------------------|------------------------------------------------|--------------|
-| **OWASP Dependency Check**      | Vulnerability scanning for dependencies         | ![OWASP](https://owasp.org/assets/images/OWASP_Logo_2016_White.png){width=30} |
-| **Eclipse Temurin Installer**   | Java runtime installer plugin                    | ☕ |
-
----
-
-## ☁️ Cloud Tools
-
-| Plugin                          | Description                                    | Logo / Badge |
-|--------------------------------|------------------------------------------------|--------------|
-| **AWS CLI**                    | AWS command line integration                      | ![AWS](https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png){width=30} |
-
----
-
-### Fonts & Styling Tips
-
-- GitHub README uses [GitHub-Flavored Markdown](https://guides.github.com/features/mastering-markdown/)
-- No custom fonts allowed in markdown, but you can use:
-  - **Bold**, *Italic*, and `code` blocks for emphasis
-  - Emojis for visual appeal
-  - Badges or icons linked from the web for logos
-- For real interactivity or animations, use GitHub Pages with HTML/CSS or MDX with React
-
----
-
-### Example Badge usage
-
-```markdown
-![Docker](https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png)
 
 
 
