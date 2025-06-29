@@ -23,7 +23,7 @@ services:
       retries: 10
 
   app:
-    image: ghandevikas/leave-management:${DOCKER_TAG:-latest}
+    image: ghandgevikas/leave-management:${DOCKER_TAG:-latest}
     container_name: leave-management-app
     depends_on:
       mysql:
