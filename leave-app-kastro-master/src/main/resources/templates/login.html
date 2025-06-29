@@ -9,16 +9,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #4CAF50;
-            --secondary-color: #2E7D32;
-            --accent-color: #FFC107;
-            --text-dark: #263238;
-            --text-light: #607D8B;
+            --primary-color: #87CEEB;  /* Sky Blue */
+            --secondary-color: #4682B4;  /* Steel Blue */
+            --accent-color: #FFD700;  /* Gold */
+            --text-dark: #1E3A8A;  /* Dark Blue */
+            --text-light: #6B7280;
             --gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
         }
         
         body {
-            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            background: linear-gradient(135deg, #F0F8FF 0%, #E6F2FF 100%);  /* Very light sky blue gradient */
             font-family: 'Poppins', sans-serif;
             min-height: 100vh;
             display: flex;
@@ -99,27 +99,26 @@
         }
         
         .profile-image {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid #3cb371; /* replaced white with green */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    margin: 0 auto 20px;
-    display: block;
-    transition: all 0.3s ease;
-}
-
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary-color);  /* Sky Blue border */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin: 0 auto 20px;
+            display: block;
+            transition: all 0.3s ease;
+        }
         
         .profile-image:hover {
             transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 8px 25px rgba(135, 206, 235, 0.3);  /* Sky Blue shadow */
         }
         
         .login-title {
             text-align: center;
             margin-bottom: 15px;
-            color: var(--text-dark);
+            color: var(--text-dark);  /* Dark Blue */
             font-weight: 700;
             font-size: 32px;
             position: relative;
@@ -167,7 +166,7 @@
         
         .btn-login:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 10px 20px rgba(135, 206, 235, 0.3);  /* Sky Blue shadow */
         }
         
         .btn-login:hover::after {
@@ -185,12 +184,12 @@
         
         .form-control:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
+            box-shadow: 0 0 0 3px rgba(135, 206, 235, 0.15);  /* Sky Blue focus */
         }
         
         .form-label {
             font-weight: 500;
-            color: var(--text-dark);
+            color: var(--text-dark);  /* Dark Blue */
             margin-bottom: 8px;
             font-size: 15px;
         }
@@ -212,7 +211,7 @@
         }
         
         .footer strong {
-            color: var(--text-dark);
+            color: var(--text-dark);  /* Dark Blue */
             font-weight: 600;
         }
         
@@ -230,7 +229,7 @@
             width: 150px;
             height: 150px;
             border-radius: 50%;
-            background: rgba(76, 175, 80, 0.1);
+            background: rgba(135, 206, 235, 0.1);  /* Sky Blue with opacity */
             z-index: -1;
         }
         
