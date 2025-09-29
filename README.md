@@ -55,6 +55,44 @@ then login into your jenkins server
 ```
 http://<your server ip>:8080
 ```
+## Optional Point Jenkins by Default Runs on The Port 8080 But Some Time We Run it On The Custom Port Like 8081 below I have Mentioned steps If u Want u can follow the steps.
+Step 1: Create an override file Run Below Command to override File.
+
+```
+sudo systemctl edit jenkins
+
+```
+It will open an editor. Add the following: Paste Below In the File.
+```
+[Service]
+Environment="JENKINS_PORT=8081"
+
+```
+Step 2: Reload systemd
+```
+sudo systemctl daemon-reload
+
+```
+
+Step 3: Restart Jenkins
+
+```
+sudo systemctl restart jenkins
+
+```
+
+```
+sudo lsof -i :8081
+```
+
+
+
+```
+sudo systemctl edit jenkins
+
+```
+
+
 
 now we need to install docker.
 
