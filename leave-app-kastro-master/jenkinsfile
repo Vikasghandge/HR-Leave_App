@@ -33,7 +33,7 @@ pipeline {
         stage('Verify') {
             steps {
                 sh """
-                echo "Currently running containers:"
+                echo "Running containers:"
                 docker ps
                 """
             }
