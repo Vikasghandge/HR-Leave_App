@@ -17,10 +17,11 @@ pipeline {
                 """
             }
         }
+
         stage('Build & Run Docker Compose') {
             steps {
                 sh """
-                cd \$APP_DIR/leave-app-kastro-master
+                cd \$APP_DIR/leave-app-kastro-master   # <- Single path only
                 echo "Stopping existing containers and removing volumes..."
                 docker-compose down -v
                 echo "Building images without cache..."
@@ -30,6 +31,7 @@ pipeline {
                 """
             }
         }
+
         stage('Verify') {
             steps {
                 sh """
@@ -39,6 +41,7 @@ pipeline {
             }
         }
     }
+
     post {
         always {
             echo "Pipeline finished at \$(date)"
