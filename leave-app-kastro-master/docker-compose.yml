@@ -23,7 +23,7 @@ services:
       retries: 10
 
   app:
-    build: .                  # <- Change this line to build fresh image from Dockerfile
+    build: /leave-app-kastro-master/.                 # <- Change this line to build fresh image from Dockerfile
     container_name: leave-management-app
     depends_on:
       mysql:
