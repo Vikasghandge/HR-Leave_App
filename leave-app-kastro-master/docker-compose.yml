@@ -23,7 +23,7 @@ services:
       retries: 10
 
   app:
-    image: ghandgevikas/leave-management:${DOCKER_TAG:-latest}
+    build: .                  # <- Change this line to build fresh image from Dockerfile
     container_name: leave-management-app
     depends_on:
       mysql:
