@@ -23,7 +23,7 @@ services:
       retries: 10
 
   app:
-    build: ./leave-app-kastro-master   # ← Changed from image to build local code
+    build: ./leave-app-kastro-master   # <- Local code se build
     container_name: leave-management-app
     depends_on:
       mysql:
