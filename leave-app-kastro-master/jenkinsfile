@@ -5,15 +5,14 @@ pipeline {
     }
     environment {
         GIT_REPO = 'https://github.com/Vikasghandge/HR-Leave_App.git'
-        APP_DIR = 'HR-Leave_App'
     }
     stages {
         stage('Checkout') {
             steps {
                 sh """
                 echo "Pulling branch: ${params.BRANCH}"
-                rm -rf \$APP_DIR
-                git clone -b ${params.BRANCH} \$GIT_REPO \$APP_DIR
+                rm -rf HR-Leave_App
+                git clone -b ${params.BRANCH} \$GIT_REPO
                 """
             }
         }
@@ -21,7 +20,7 @@ pipeline {
         stage('Build & Run Docker Compose') {
             steps {
                 sh """
-                cd \$APP_DIR/leave-app-kastro-master   # <- Single path only
+                cd HR-Leave_App/leave-app-kastro-master
                 echo "Stopping existing containers and removing volumes..."
                 docker-compose down -v
                 echo "Building images without cache..."
