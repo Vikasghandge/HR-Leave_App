@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'worker-1' }  // your worker node
+    agent { label 'agent-1' }  // your worker node
     parameters {
         string(name: 'BRANCH', defaultValue: 'dev', description: 'Git branch to build')
     }
