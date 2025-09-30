@@ -1,11 +1,11 @@
 pipeline {
-    agent { label 'agent-1' }  // your worker node
+    agent { label 'agent-1' } // tumhara worker node
     parameters {
         string(name: 'BRANCH', defaultValue: 'dev', description: 'Git branch to build')
     }
     environment {
         GIT_REPO = 'https://github.com/Vikasghandge/HR-Leave_App.git'
-        APP_DIR = '/HR-Leave_App'
+        APP_DIR = '/home/ubuntu/HR-Leave_App'
     }
     stages {
         stage('Checkout') {
@@ -20,7 +20,7 @@ pipeline {
         stage('Build & Run Docker Compose') {
             steps {
                 sh """
-                cd \$APP_DIR
+                cd \$APP_DIR/leave-app-kastro-master
                 docker-compose down
                 docker-compose up -d --build
                 """
@@ -29,6 +29,7 @@ pipeline {
         stage('Verify') {
             steps {
                 sh """
+                echo "Running containers:"
                 docker ps
                 """
             }
