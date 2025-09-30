@@ -1,49 +1,37 @@
 pipeline {
-    agent { label 'agent-1' }
+    agent { label 'worker-1' }  // your worker node
     parameters {
         string(name: 'BRANCH', defaultValue: 'dev', description: 'Git branch to build')
     }
     environment {
         GIT_REPO = 'https://github.com/Vikasghandge/HR-Leave_App.git'
+        APP_DIR = '/HR-Leave_App'
     }
     stages {
         stage('Checkout') {
             steps {
                 sh """
                 echo "Pulling branch: ${params.BRANCH}"
-                rm -rf HR-Leave_App
-                git clone -b ${params.BRANCH} \$GIT_REPO
+                rm -rf \$APP_DIR
+                git clone -b ${params.BRANCH} \$GIT_REPO \$APP_DIR
                 """
             }
         }
-
         stage('Build & Run Docker Compose') {
             steps {
                 sh """
-                cd HR-Leave_App/leave-app-kastro-master
-                echo "Stopping existing containers and removing volumes..."
-                docker-compose down -v
-                echo "Building images without cache..."
-                docker-compose build --no-cache
-                echo "Starting containers..."
-                docker-compose up -d
+                cd \$APP_DIR
+                docker-compose down
+                docker-compose up -d --build
                 """
             }
         }
-
         stage('Verify') {
             steps {
                 sh """
-                echo "Running containers:"
                 docker ps
                 """
             }
-        }
-    }
-
-    post {
-        always {
-            echo "Pipeline finished at \$(date)"
         }
     }
 }
