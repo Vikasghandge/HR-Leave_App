@@ -1,4 +1,4 @@
-# (This stays inside Jenkinsfile's 'Prepare Docker Assets' stage)
+## (This stays inside Jenkinsfile's 'Prepare Docker Assets' stage)
 wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -O wait-for-it.sh
 
 # Ensure correct shebang for Alpine bash
