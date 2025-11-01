@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login - Leave Management System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2E7D32;
+            --accent-color: #FFC107;
+            --text-dark: #263238;
+            --text-light: #607D8B;
+            --gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .developer-credit {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--text-dark);
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .youtube-link {
+            color: #ff0000;
+            border: 1px solid rgba(255, 0, 0, 0.2);
+        }
+        
+        .youtube-link:hover {
+            color: #fff;
+            background: #ff0000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
+        }
+        
+        .linkedin-link {
+            color: #0a66c2;
+            border: 1px solid rgba(10, 102, 194, 0.2);
+        }
+        
+        .linkedin-link:hover {
+            color: #fff;
+            background: #0a66c2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(10, 102, 194, 0.2);
+        }
+        
+        .login-container {
+            max-width: 450px;
+            margin: 30px auto;
+            padding: 40px;
+            background-color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: var(--gradient);
+        }
+        
+        .profile-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin: 0 auto 20px;
+            display: block;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+        }
+        
+        .login-title {
+            text-align: center;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+            font-weight: 700;
+            font-size: 32px;
+            position: relative;
+        }
+        
+        .login-title span {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .login-subtitle {
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-size: 15px;
+            font-weight: 400;
+        }
+        
+        .btn-login {
+            background: var(--gradient);
+            border: none;
+            width: 100%;
+            padding: 13px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-login::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn-login:hover::after {
+            left: 100%;
+        }
+        
+        .form-control {
+            padding: 13px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        
+        .alert {
+            margin-bottom: 25px;
+            border-radius: 10px;
+            padding: 13px 16px;
+            border: none;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: auto;
+            padding: 25px;
+            color: var(--text-light);
+            font-size: 14px;
+            font-weight: 400;
+        }
+        
+        .footer strong {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+        
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-right: none;
+        }
+        
+        .input-with-icon {
+            border-left: none;
+        }
+        
+        .floating-decoration {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(76, 175, 80, 0.1);
+            z-index: -1;
+        }
+        
+        .decoration-1 {
+            top: -50px;
+            right: -50px;
+        }
+        
+        .decoration-2 {
+            bottom: -30px;
+            left: -30px;
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-decoration decoration-1"></div>
+    <div class="floating-decoration decoration-2"></div>
+    
+    <div class="developer-credit">
+        <div>This app is developed by <strong>KASTRO</strong></div>
+        <div class="social-links">
+            <a href="https://www.youtube.com/@LearnWithKASTRO" class="social-link youtube-link" target="_blank">
+                <i class="fab fa-youtube"></i>
+                <span>YouTube</span>
+            </a>
+            <a href="https://www.linkedin.com/in/kastro-kiran/" class="social-link linkedin-link" target="_blank">
+                <i class="fab fa-linkedin-in"></i>
+                <span>LinkedIn</span>
+            </a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="login-container">
+            <img src="https://media.licdn.com/dms/image/v2/D5603AQHJB_lF1d9OSw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1718971147172?e=1752105600&v=beta&t=VO5jO8GYVs-_UNrKx9gQdrPlM_CuD1VjWqpyD0CZLTs" 
+                 alt="Profile Image" class="profile-image">
+            
+            <h2 class="login-title">Leave <span>Management</span> System</h2>
+            <p class="login-subtitle">Streamline your leave requests and approvals</p>
+            
+            <div th:if="${param.error}" class="alert alert-danger">
+                <i class="fas fa-exclamation-circle me-2"></i>Invalid employee ID or password
+            </div>
+            <div th:if="${param.logout}" class="alert alert-success">
+                <i class="fas fa-check-circle me-2"></i>You have been logged out
+            </div>
+            
+            <form class="login-form" th:action="@{/login}" method="post">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Employee ID</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control input-with-icon" id="username" name="username" required placeholder="Enter your employee ID">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control input-with-icon" id="password" name="password" required placeholder="Enter your password">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-login">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="footer">
+        &copy; <span id="year"></span> All rights reserved by <strong>KASTRO</strong>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

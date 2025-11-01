@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Employee Dashboard - Leave Management System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #4e73df;
+            color: white;
+        }
+        .sidebar a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+            transition: 0.3s;
+        }
+        .sidebar a:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .sidebar a.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid white;
+        }
+        .content {
+            padding: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+            font-weight: 600;
+        }
+        .badge-pending {
+            background-color: #f6c23e;
+        }
+        .badge-approved {
+            background-color: #1cc88a;
+        }
+        .badge-rejected {
+            background-color: #e74a3b;
+        }
+        .welcome-banner {
+            background-color: #4e73df;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="d-flex flex-column">
+                    <div class="p-4 text-center">
+                        <h4>Leave Management</h4>
+                    </div>
+                    <a href="/employee/dashboard" class="active">
+                        <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                    </a>
+                    <a href="/employee/apply-leave">
+                        <i class="bi bi-calendar-plus me-2"></i> Apply Leave
+                    </a>
+                    <a href="/employee/leave-status">
+                        <i class="bi bi-list-check me-2"></i> Leave Status
+                    </a>
+                    <a href="/logout" class="mt-auto">
+                        <i class="bi bi-box-arrow-right me-2"></i> Logout
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 content">
+                <!-- Alerts -->
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <!-- Welcome Banner -->
+                <div class="welcome-banner">
+                    <h3>Welcome, <span th:text="${user.name}"></span>!</h3>
+                    <p>Employee ID: <span th:text="${user.employeeId}"></span></p>
+                </div>
+                
+                <!-- Dashboard Content -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <i class="bi bi-calendar-check" style="font-size: 2rem; color: #4e73df;"></i>
+                                <h5 class="mt-3">Apply for Leave</h5>
+                                <p>Submit a new leave application</p>
+                                <a href="/employee/apply-leave" class="btn btn-primary">Apply Now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <i class="bi bi-list-check" style="font-size: 2rem; color: #1cc88a;"></i>
+                                <h5 class="mt-3">Check Leave Status</h5>
+                                <p>View status of your leave applications</p>
+                                <a href="/employee/leave-status" class="btn btn-success">View Status</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <i class="bi bi-person" style="font-size: 2rem; color: #36b9cc;"></i>
+                                <h5 class="mt-3">My Profile</h5>
+                                <p>View your personal information</p>
+                                <a href="#" class="btn btn-info">View Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Leaves -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        Recent Leave Applications
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>From Date</th>
+                                        <th>To Date</th>
+                                        <th>Reason</th>
+                                        <th>Applied On</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="leave : ${leaves}" th:if="${leaves != null && !leaves.empty}">
+                                        <td th:text="${#temporals.format(leave.fromDate, 'dd-MM-yyyy')}"></td>
+                                        <td th:text="${#temporals.format(leave.toDate, 'dd-MM-yyyy')}"></td>
+                                        <td th:text="${leave.reason.toString().replace('_', ' ')}"></td>
+                                        <td th:text="${#temporals.format(leave.appliedDate, 'dd-MM-yyyy')}"></td>
+                                        <td>
+                                            <span th:if="${leave.status.name() == 'PENDING'}" class="badge bg-warning">Pending</span>
+                                            <span th:if="${leave.status.name() == 'APPROVED'}" class="badge bg-success">Approved</span>
+                                            <span th:if="${leave.status.name() == 'REJECTED'}" class="badge bg-danger">Rejected</span>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${leaves == null || leaves.empty}">
+                                        <td colspan="5" class="text-center">No leave applications found</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

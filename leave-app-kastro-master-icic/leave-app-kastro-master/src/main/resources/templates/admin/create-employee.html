@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Employee - Leave Management System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #36b9cc;
+            color: white;
+        }
+        .sidebar a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+            transition: 0.3s;
+        }
+        .sidebar a:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .sidebar a.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid white;
+        }
+        .content {
+            padding: 20px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        .form-control {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .form-label {
+            font-weight: 500;
+        }
+        .btn-create {
+            background-color: #36b9cc;
+            border-color: #36b9cc;
+            padding: 10px 20px;
+        }
+        .btn-create:hover {
+            background-color: #2c9faf;
+            border-color: #2c9faf;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="d-flex flex-column">
+                    <div class="p-4 text-center">
+                        <h4>Admin Dashboard</h4>
+                    </div>
+                    <a href="/admin/dashboard">
+                        <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                    </a>
+                    <a href="/admin/create-employee" class="active">
+                        <i class="bi bi-person-plus me-2"></i> Create Employee
+                    </a>
+                    <a href="/admin/employees">
+                        <i class="bi bi-people me-2"></i> Manage Employees
+                    </a>
+                    <a href="/admin/manage-leaves">
+                        <i class="bi bi-calendar-check me-2"></i> Manage Leaves
+                    </a>
+                    <a href="/logout" class="mt-auto">
+                        <i class="bi bi-box-arrow-right me-2"></i> Logout
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 content">
+                <h2 class="mb-4">Create New Employee</h2>
+                
+                <!-- Alerts -->
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <form th:action="@{/admin/create-employee}" th:object="${user}" method="post">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="employeeId" class="form-label">Employee ID</label>
+                                    <input type="text" class="form-control" id="employeeId" th:field="*{employeeId}" required placeholder="e.g., EMP002">
+                                    <div class="form-text">This ID will be used for login.</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="password" th:field="*{password}" required>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="name" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="/admin/dashboard" class="btn btn-secondary me-md-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary btn-create">Create Employee</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        Important Notes
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li>Employee ID must be unique and will be used for login</li>
+                            <li>Passwords should be at least 6 characters</li>
+                            <li>Share the Employee ID and Password with the employee securely</li>
+                            <li>Employees will use these credentials to login and apply for leave</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form validation
+            const form = document.querySelector('form');
+            const employeeIdInput = document.getElementById('employeeId');
+            const passwordInput = document.getElementById('password');
+            
+            form.addEventListener('submit', function(event) {
+                if (passwordInput.value.length < 6) {
+                    event.preventDefault();
+                    alert('Password must be at least 6 characters');
+                }
+                
+                if (!/^[A-Za-z0-9]+$/.test(employeeIdInput.value)) {
+                    event.preventDefault();
+                    alert('Employee ID must contain only letters and numbers');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

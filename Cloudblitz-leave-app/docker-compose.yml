@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: cloudblitz-leave-mysql
+    restart: always
+    ports:
+      - "3307:3306"  # Different external port
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: cloudblitz_leavemanagement  # Different database name
+      MYSQL_USER: cloudblitz_user  # Different user
+      MYSQL_PASSWORD: password
+    volumes:
+      - cloudblitz-mysql-data:/var/lib/mysql  # Different volume
+    networks:
+      - cloudblitz-network  # Different network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  app:
+    image: ghandgevikas/leave-management:${DOCKER_TAG:-latest}
+    container_name: cloudblitz-leave-app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/cloudblitz_leavemanagement?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&autoReconnect=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+      SERVER_PORT: 8091  # Different internal port
+    networks:
+      - cloudblitz-network
+    restart: unless-stopped
+
+  nginx:
+    build: ./nginx
+    container_name: cloudblitz-leave-nginx
+    restart: unless-stopped
+    ports:
+      - "8081:80"  # Different external port
+    depends_on:
+      - app
+    networks:
+      - cloudblitz-network
+
+networks:
+  cloudblitz-network:
+    driver: bridge
+
+volumes:
+  cloudblitz-mysql-data:  # Different volume

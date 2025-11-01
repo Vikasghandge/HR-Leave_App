@@ -1,0 +1,34 @@
+# MySQL Commands for Leave Management Application
+
+# 1. Connect to MySQL Container
+docker exec -it leave-management-mysql mysql -u root -p
+# Enter password when prompted: password
+
+# 2. Show Databases
+SHOW DATABASES;
+
+# 3. Use Leave Management Database
+USE leavemanagement;
+
+# 4. Show Tables
+SHOW TABLES;
+
+# 5. Query Users Table
+SELECT * FROM users;
+
+# 6. Query Leaves Table
+SELECT * FROM leaves;
+
+# 7. Join Users and Leaves Tables
+SELECT l.id, u.name, u.employee_id, l.from_date, l.to_date, l.reason, l.status 
+FROM leaves l
+JOIN users u ON l.employee_id = u.id;
+
+# 8. Check Pending Leaves
+SELECT l.id, u.name, u.employee_id, l.from_date, l.to_date, l.reason 
+FROM leaves l
+JOIN users u ON l.employee_id = u.id
+WHERE l.status = 'PENDING';
+
+# 9. Exit MySQL
+EXIT;
