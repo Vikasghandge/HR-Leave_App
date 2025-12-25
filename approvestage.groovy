@@ -166,7 +166,7 @@ pipeline {
                         
                         Jenkins Build URL: ${BUILD_URL}
                         """,
-                        to: 'ghandgevikas804@gmail.com'
+                        to: 'ghandgevikas@gmail.com'
                     )
                 }
             }
